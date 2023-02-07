@@ -1,0 +1,20 @@
+{
+    "jupyter.kernels.filter": [
+        {
+            "path": "/opt/anaconda3/envs/homework2/bin/python",
+            "type": "pythonEnvironment"
+        },
+        {
+            "path": "/opt/anaconda3/envs/hw5/bin/python",
+            "type": "pythonEnvironment"
+        },
+        {
+            "path": "/opt/anaconda3/envs/ml4t/bin/python",
+            "type": "pythonEnvironment"
+        },
+        {
+            "path": "/opt/homebrew/bin/python3",
+            "type": "pythonEnvironment"
+        }
+    ]
+}
