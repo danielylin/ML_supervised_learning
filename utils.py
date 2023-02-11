@@ -22,10 +22,34 @@ def get_data(dataset:str = "nba"):
         for data in df_list:
             data.dropna(how = "all", axis=1, inplace=True)
 
-        df = pd.concat(df_list)
+        df = pd.concat(df_list, ignore_index=True)
 
     if title == "mushroom":
-        df = pd.read_csv("data/agaricus-lepiota.data")
+        colnames = ['class',
+                    'cap-shape',
+                    'cap-surface',
+                    'cap-color',
+                    'bruises',
+                    'odor',
+                    'gill-attachment',
+                    'gill-spacing',
+                    'gill-size',
+                    'gill-color',
+                    'stalk-shape',
+                    'stalk-root',
+                    'stalk-surface-above-ring',
+                    'stalk-surface-below-ring',
+                    'stalk-color-above-ring',
+                    'stalk-color-below-ring',
+                    'veil-type',
+                    'veil-color',
+                    'ring-number',
+                    'ring-type',
+                    'spore-print-color',
+                    'population',
+                    'habitat']
+        df = pd.read_csv("data/agaricus-lepiota.data", header=None, names=colnames)
+
 
     if title == "occupancy":
         path = os.getcwd()
@@ -48,17 +72,22 @@ def get_nfl_data():
     df_3rd = df[df['Down'] == 3]
     df_3rd = df_3rd[df_3rd["IsNoPlay"] == 0]
     X_vals = ["ToGo", "Formation", "IsPass", "YardLineFixed",
-              "Quarter", "Minute", "Second"]
+              "Quarter", "Minute", "Second", "PassType", "RushDirection",
+              "OffenseTeam", "DefenseTeam"]
     X = df_3rd[X_vals]
     X.loc[:, "TimeLeftQuarter"] = X["Minute"]*60+X["Second"]
     X = X.drop(["Minute", "Second"], axis = 1)
     ohe = OneHotEncoder(sparse=False)
-    cat_features = ["Formation"]
+    cat_features = ["Formation", "RushDirection", "PassType", "OffenseTeam", "DefenseTeam"]
     vals = ohe.fit_transform(df_3rd[cat_features])
     cols = ohe.get_feature_names_out(cat_features)
     converter = lambda x: x.replace(' ', '_')
     cols = list(map(converter, cols))
     categorical_x = pd.DataFrame(vals, columns = cols)
+    categorical_x.drop(
+        columns=[col for col in categorical_x.columns if "nan" in col],
+        inplace=True)
+
     X = pd.concat([X.drop(cat_features, axis = 1).reset_index(drop=True),
         categorical_x.astype(int).reset_index(drop=True)], axis = 1
         )
@@ -77,9 +106,9 @@ def get_nba_data():
 
 def get_mushroom_data():
     df = get_data("mushroom")
-    df["p"] = np.where(df["p"] == "p", 1, 0)
-    y = df["p"]
-    X = df.drop(["p"], axis=1)
+    df["class"] = np.where(df["class"] == "p", 1, 0)
+    y = df["class"]
+    X = df.drop(["class"], axis=1)
     ohe = OneHotEncoder(sparse=False)
     vals = ohe.fit_transform(X)
     cols = ohe.get_feature_names_out(X.columns)
@@ -99,9 +128,10 @@ def prepare_data(df, y_val, X_vals, drop=True):
     return X, y
 
 if __name__ == "__main__":
-    X, y = get_occupancy_data()
-    print(X.head())
-    print(y)
+    X, y = get_nfl_data()
+    # print(X.head())
+    for val in X.columns:
+        print(val)
 
 
 
