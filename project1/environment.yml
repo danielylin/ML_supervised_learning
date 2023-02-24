@@ -1,0 +1,14 @@
+name: CS7641
+channels:
+  - defaults
+dependencies:
+  - scikit-learn
+  - numpy
+  - scipy
+  - pandas
+  - pytest
+  - pip
+  - pip:
+    - matplotlib==3.1.0
+
+
